@@ -10,6 +10,6 @@ class WpProjectScaffold < Formula
   end
 
   test do
-    system "false"
+    wp-project-scaffold --version
   end
 end

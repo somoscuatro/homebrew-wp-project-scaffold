@@ -6,7 +6,7 @@ class WpScaffold < Formula
   license "MIT"
 
   def install
-    bin.install "wp-scaffold"
+    bin.install "wp-scaffold.sh"
   end
 
   test do

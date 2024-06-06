@@ -2,7 +2,7 @@ class WpProjectScaffold < Formula
   desc "Scaffolds a WordPress project using Docker and optionally a starter theme"
   homepage "https://github.com/somoscuatro/homebrew-wp-project-scaffold"
   url "https://github.com/somoscuatro/homebrew-wp-project-scaffold/archive/refs/tags/v1.0.0.tar.gz"
-  sha256 "d81757d7432b0cd13d63a91c02b124c7a01c0bbd99c08887228ace215137c2c7"
+  sha256 "0672a15fd6a94ea9e77c66dceaba99cfaaf10ebde93fb5a3cb0ed1ebc14b7ada"
   license "MIT"
 
   def install

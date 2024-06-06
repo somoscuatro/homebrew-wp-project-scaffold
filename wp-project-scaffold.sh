@@ -206,9 +206,14 @@ sed -i '' -e "/define( 'DB_COLLATE', '' );/a\\
 define( 'WP_SITEURL', getenv( 'WP_SITEURL' ) );\\
 define( 'WP_HOME', getenv( 'WP_HOME' ) );" wp-config.php
 
+# Wait for the database container to be ready
+until docker-compose exec db mysqladmin ping --silent; do
+  sleep 1
+done
+
 # Install WordPress
-wp_core_install_command="core install --url=https://${SAFE_PROJECT_NAME}.test --title=${SAFE_PROJECT_NAME} --admin_user=admin --admin_password=admin --admin_email=tech@somoscuatro.es"
-run_cmd docker-compose run --rm cli $wp_core_install_command
+wp_core_install_command="core install --url=https://{$SAFE_PROJECT_NAME}.test --title=$SAFE_PROJECT_NAME --admin_user=admin --admin_password=admin --admin_email=tech@somoscuatro.es"
+docker-compose run --rm cli $wp_core_install_command
 
 # Install sc-startup-theme
 if [[ $INSTALL_THEME =~ ^[Yy]$ ]]; then

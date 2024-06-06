@@ -1,5 +1,5 @@
 #!/bin/bash
-# version 0.6.0
+# version 0.7.0
 
 # Define the repository URL
 REPO_URL="https://github.com/somoscuatro/docker-wordpress-local.git"

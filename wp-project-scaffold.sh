@@ -172,7 +172,6 @@ sed -i.bak "s|your-project|$SAFE_PROJECT_NAME|g" .env && rm -f .env.bak
 mkdir -p .docker/certs
 cd .docker/certs
 
-echo
 echo "🚧 Installing SSL certificates..."
 run_cmd mkcert -key-file cert-key.pem -cert-file cert.pem "${SAFE_PROJECT_NAME}.test" localhost
 
@@ -208,7 +207,7 @@ define( 'WP_SITEURL', getenv( 'WP_SITEURL' ) );\\
 define( 'WP_HOME', getenv( 'WP_HOME' ) );" wp-config.php
 
 # Install WordPress
-wp_core_install_command="core install --url=https://${SAFE_PROJECT_NAME}.test --title=${PROJECT_NAME} --admin_user=admin --admin_password=admin --admin_email=tech@somoscuatro.es"
+wp_core_install_command="core install --url=https://${SAFE_PROJECT_NAME}.test --title=${SAFE_PROJECT_NAME} --admin_user=admin --admin_password=admin --admin_email=tech@somoscuatro.es"
 run_cmd docker-compose run --rm cli $wp_core_install_command
 
 # Install sc-startup-theme

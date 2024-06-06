@@ -2,7 +2,7 @@
 
 # Check for flags
 if [[ "$1" == "--version" ]]; then
-    echo "wp-project-scaffold v1.0.1"
+    echo "wp-project-scaffold v1.0.2"
     exit 0
 fi
 

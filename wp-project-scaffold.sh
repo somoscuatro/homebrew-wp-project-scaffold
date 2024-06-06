@@ -240,6 +240,12 @@ if [[ $INSTALL_THEME =~ ^[Yy]$ ]]; then
         exit 1
     fi
 
+    rm -rf .git
+    cd ../../../
+    rm -rf .pnpm-store
+    run_cmd git add .
+    run_cmd git commit -m "feat: add theme sc-starter-theme"
+
     run_cmd docker-compose run --rm cli theme activate sc-starter-theme
 else
     echo

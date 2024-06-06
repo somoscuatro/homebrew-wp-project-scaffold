@@ -6,7 +6,7 @@ class WpScaffold < Formula
   license "MIT"
 
   def install
-    system "./configure", "--disable-silent-rules", *std_configure_args
+    bin.install "wp-scaffold"
   end
 
   test do

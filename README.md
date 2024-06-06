@@ -48,10 +48,16 @@ Running this command will:
 
 Set up a local WordPress development environment using the [somoscuatro Docker
 Compose configuration](https://github.com/somoscuatro/docker-wordpress-local).
+
 Optionally, install the [somoscuatro WordPress Starter
 Theme](https://github.com/somoscuatro/sc-starter-theme) to jumpstart your theme
 development. For more detailed information and advanced usage, please refer to
 the respective GitHub repositories linked above.
+
+Credentials to access `/wp-admin` are:
+
+- username: `admin`
+- password: `admin`
 
 Happy coding, and enjoy building your WordPress site with ease!
 

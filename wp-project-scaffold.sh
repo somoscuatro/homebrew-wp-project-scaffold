@@ -137,6 +137,7 @@ mkdir -p .docker/certs
 cd .docker/certs
 
 echo "🚧 Installing SSL certificates..."
+echo
 run_cmd mkcert -key-file cert-key.pem -cert-file cert.pem "${SAFE_PROJECT_NAME}.test" localhost
 
 cd ../../
@@ -183,8 +184,8 @@ until docker-compose exec db mysqladmin ping --silent; do
 done
 
 # Install WordPress
-wp_core_install_command="core install --url=https://{$SAFE_PROJECT_NAME}.test --title=$SAFE_PROJECT_NAME --admin_user=admin --admin_password=admin --admin_email=tech@somoscuatro.es"
-docker-compose run --rm cli $wp_core_install_command
+wp_core_install_command="core install --url=https://{$SAFE_PROJECT_NAME}.test --title=$SAFE_PROJECT_NAME --admin_user=admin --admin_password=admin --admin_email=$AUTHOR_EMAIL"
+run_cmd docker-compose run --rm cli $wp_core_install_command
 
 # Install sc-startup-theme
 if [[ $INSTALL_THEME =~ ^[Yy]$ ]]; then

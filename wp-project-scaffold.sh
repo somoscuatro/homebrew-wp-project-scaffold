@@ -22,9 +22,29 @@ run_cmd() {
 
 # Prompts
 read -p "💬 Enter the name of your project: " PROJECT_NAME
+echo
 SAFE_PROJECT_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | LC_ALL=C sed -e 's/[^[:alnum:]-]/-/g' -e 's/--*/-/g')
 
+read -p "💬 Enter the GitHub author (default: https://github.com/somoscuatro): " AUTHOR_GITHUB
 echo
+AUTHOR_GITHUB=${AUTHOR_GITHUB:-https://github.com/somoscuatro}
+
+read -p "💬 Enter the author email (default: tech@somoscuatro.es): " AUTHOR_EMAIL
+echo
+AUTHOR_EMAIL=${AUTHOR_EMAIL:-tech@somoscuatro.es}
+
+read -p "💬 Enter the author URL (default: https://somoscuatro.es): " AUTHOR_URL
+echo
+AUTHOR_URL=${AUTHOR_URL:-https://somoscuatro.es}
+
+read -p "💬 Enter the author name (default: somoscuatro): " AUTHOR
+echo
+SAFE_AUTHOR=${AUTHOR:-somoscuatro}
+
+read -p "💬 Enter the project description (default: “My beautiful WordPress project.”): " PROJECT_DESCRIPTION
+echo
+PROJECT_DESCRIPTION=${PROJECT_DESCRIPTION:-"My beautiful WordPress project."}
+
 echo "Optionally, you can install the somoscuatro starter theme, which"
 echo "offers a robust foundation for your WordPress project. Please note"
 echo "that this theme relies on the Advanced Custom Fields Pro (ACF Pro)"
@@ -79,94 +99,38 @@ fi
 
 cd "$SAFE_PROJECT_NAME"
 
-# Prepare project local repository
-rm -rf .git
-cat << 'EOF' > .gitignore
-# WordPress
-/wp-config.php
-/wp-content/uploads/*
-!/wp-content/uploads/.htaccess
-
-# WordPress development plugins
-*/plugins/mailhog/
-*/plugins/disable-emails/
-*/plugins/woocommerce-email-test/
-*/plugins/query-monitor/
-
-# Ignore these WordPress plugins from the core
-*/plugins/hello.php
-*/plugins/akismet/
-
-# Ignore specific WordPress themes
-*/themes/twenty*/
-*/themes/storefront*/
-
-# Ignore cache files
-/wp-content/litespeed/
-/wp-content/cache/
-/wp-content/autoptimize_404_handler.php
-
-# Plugin ewww-image-optimizer
-/wp-content/ewww/
-
-# Plugin webp-express
-/wp-content/webp-express/
-/wp-content/themes/.htaccess
-/wp-content/uploads/.htaccess
-
-# Env
-.env*
-!.env.example
-
-# Dependencies
-/vendor
-node_modules/
-
-# SQL dumps
-*.sql
-*.sqlite
-
-# Logs
-*.log
-*/debug.log
-php_errorlog
-
-# OS
-*.url
-*.lnk
-.DS*
-
-# Git
-.project
-.idea/
-.well-known
-/tags
-
-# Patch/diff artifacts
-*.diff
-*.orig
-*.rej
-interdiff*.txt
-
-# VS Code
-*code-workspace
-
-# VIM
-*.un~
-Session.vim
-.netrwhist
-*~
-*.swp
-.lvimrc
-
-# emacs artifacts
-*~
-\#*\#
-EOF
-
 # Create .env file
 mv .env.sample .env
 sed -i.bak "s|your-project|$SAFE_PROJECT_NAME|g" .env && rm -f .env.bak
+
+# Clone the wp-project-default-settings repository
+echo "🚧 Adding default WordPress settings..."
+echo
+run_cmd git clone git@github.com:somoscuatro/wp-project-default-settings.git wp-project-default-settings-temp
+
+if [ ! -d "wp-project-default-settings-temp" ]; then
+    echo "☠️ Failed to clone the wp-project-default-settings repository. Please check the URL and try again."
+    exit 1
+fi
+
+run_cmd cp -r wp-project-default-settings-temp/common/. .
+
+if [[ $INSTALL_THEME =~ ^[Yy]$ ]]; then
+    run_cmd cp -r wp-project-default-settings-temp/with-starter-theme/. .
+else
+    run_cmd cp -r wp-project-default-settings-temp/without-starter-theme/. .
+fi
+
+sed -i.bak -e "s|your-project|$SAFE_PROJECT_NAME|g" \
+           -e "s|author-github|$AUTHOR_GITHUB|g" \
+           -e "s|author-email|$AUTHOR_EMAIL|g" \
+           -e "s|author-url|$AUTHOR_URL|g" \
+           -e "s|author-name|$SAFE_AUTHOR|g" \
+           -e "s|project-description|$PROJECT_DESCRIPTION|g" \
+           .gitignore composer.json package.json phpstan.neon.dist
+run_cmd rm -f .gitignore.bak composer.json.bak package.json.bak phpstan.neon.dist.bak
+
+run_cmd rm -rf wp-project-default-settings-temp
 
 # Prepare SSL certificates
 mkdir -p .docker/certs
@@ -186,7 +150,14 @@ while ! docker-compose exec -T wp ls "/var/www/html/wp-settings.php" &> /dev/nul
     sleep 5
 done
 
+# Install dependencies
+echo "🚧 Installing dependencies. This might take a while..."
+    run_cmd docker-compose run --rm wp composer install
+    run_cmd docker-compose run --rm wp pnpm install
+echo
+
 # Create project repo and make initial commit
+rm -rf .git
 run_cmd git init
 run_cmd git add .
 run_cmd git commit -m "feat: scaffold wordpress installation using somoscuatro/docker-wordpress-local"
@@ -240,9 +211,14 @@ if [[ $INSTALL_THEME =~ ^[Yy]$ ]]; then
         exit 1
     fi
 
-    rm -rf .git
+    run_cmd rm -rf .git
+
+    run_cmd rm -rf .github .husky .vscode patches .editorconfig .env.example
+    rum_cmd rm -rf .eslintrc.json .gitignore .prettierignore .stylelintrc
+    run_cmd rm -rf CODE_OF_CONDUCT.md commitlint.config.json LICENSE.md
+    run_cmd rm -rf phpcs.xml phpstand.neon.dist README.md SECURITY.md
+
     cd ../../../
-    rm -rf .pnpm-store
     run_cmd git add .
     run_cmd git commit -m "feat: add theme sc-starter-theme"
 

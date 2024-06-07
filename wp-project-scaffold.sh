@@ -144,8 +144,8 @@ cd ../../
 # Start Docker containers
 run_cmd docker-compose up -d
 
-echo
 echo "🚧 Downloading WordPress Core..."
+echo
 while ! docker-compose exec -T wp ls "/var/www/html/wp-settings.php" &> /dev/null; do
     sleep 5
 done
@@ -200,8 +200,8 @@ if [[ $INSTALL_THEME =~ ^[Yy]$ ]]; then
 
     cd sc-starter-theme
 
-    echo
     echo "🚧 Installing sc-starter-theme dependencies. This might take a while..."
+    echo
     run_cmd docker-compose run --rm wp composer install --working-dir=wp-content/themes/sc-starter-theme
     run_cmd docker-compose run --rm wp pnpm --dir=wp-content/themes/sc-starter-theme install
     run_cmd docker-compose run --rm wp pnpm --dir=wp-content/themes/sc-starter-theme run build
@@ -229,4 +229,4 @@ else
 fi
 
 echo
-echo "✅ The website is ready is ready to be visited at https://${SAFE_PROJECT_NAME}.test"
+echo "✅ The website is ready to be visited at https://${SAFE_PROJECT_NAME}.test"
